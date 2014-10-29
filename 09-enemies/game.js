@@ -160,10 +160,10 @@ var PlayerShip = function() {
 	    pulsado = Game.keys['fire'];
 	}else if(Game.keys['fireb'] && this.reload < 0 && !pulsado) {
 		this.reload = this.reloadTime;
-	    this.board.add(new FireBall(this.x+this.w/2,this.y+this.h/2));
+	    this.board.add(new FireBall(this.x+this.w/2,this.y+this.h/2, true));
 	}else if(Game.keys['firen'] && this.reload < 0 && !pulsado) {
 		this.reload = this.reloadTime;
-	    this.board.add(new FireBall(this.x+this.w/2,this.y+this.h/2));
+	    this.board.add(new FireBall(this.x+this.w/2,this.y+this.h/2, false));
 	}
     }
 
@@ -194,18 +194,35 @@ PlayerMissile.prototype.draw = function(ctx)  {
     SpriteSheet.draw(ctx,'missile',this.x,this.y);
 };
 
-var FireBall = function(x,y) {
+var FireBall = function(x,y,izquierda) {
 
     this.w = SpriteSheet.map['fireball'].w;
     this.h = SpriteSheet.map['fireball'].h;
     this.x = x - this.w/2; 
-
+	this.t = 0;
     this.y = y - this.h; 
     this.vy = -700;
+    if(izquierda){
+		this.vx = -50;
+	}else{
+		this.vx = 50;
+	}
+
 };
 
 FireBall.prototype.step = function(dt)  {
+	this.t += dt;
+	//this.vy = this.E + this.F * Math.sin(this.G * this.t + this.H);
+	//this.vx = this.A + this.B * Math.sin(this.C * this.t + this.D);
+    //this.vy = -20 + 100 * Math.sin(1 * this.t + Math.PI/2);
+	//this.vx = 0 + -100 * Math.sin(1 * this.t + 0);
+	//this.vx = 50;
+    //this.x += this.vx*dt;
+    //this.y += -(this.x*this.x+this.x+80)*dt;
+    this.x += this.vx * dt;
     this.y += this.vy * dt;
+    this.vy=this.vy + 20;
+        
     if(this.y < -this.h) { this.board.remove(this); }
 };
 
