@@ -212,13 +212,6 @@ var FireBall = function(x,y,izquierda) {
 
 FireBall.prototype.step = function(dt)  {
 	this.t += dt;
-	//this.vy = this.E + this.F * Math.sin(this.G * this.t + this.H);
-	//this.vx = this.A + this.B * Math.sin(this.C * this.t + this.D);
-    //this.vy = -20 + 100 * Math.sin(1 * this.t + Math.PI/2);
-	//this.vx = 0 + -100 * Math.sin(1 * this.t + 0);
-	//this.vx = 50;
-    //this.x += this.vx*dt;
-    //this.y += -(this.x*this.x+this.x+80)*dt;
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.vy=this.vy + 20;
