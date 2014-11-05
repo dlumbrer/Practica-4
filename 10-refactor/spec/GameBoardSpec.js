@@ -56,3 +56,86 @@
     colisionado con objetos de cierto tipo, no con todos los objetos.
 
 */
+
+describe("Game Board", function(){
+	
+	
+	
+	it("GameBoard.add()", function(){
+		var board = new GameBoard();
+		var dummy = {};
+		spyOn(board, "add").andCallThrough();
+		board.add(dummy);
+
+		expect(board).toBe(dummy.board);
+		
+		
+	});
+	
+	it("Procesos de borrado (reset+remove+finally)", function(){
+		var board = new GameBoard();
+		var dummy = {};
+		var dummy2 = {};
+		var dummy3 = {};
+		spyOn(board, "add").andCallThrough();
+		spyOn(board, "remove").andCallThrough();
+		spyOn(board, "resetRemoved").andCallThrough();
+		spyOn(board, "finalizeRemoved").andCallThrough();
+
+		board.add(dummy);
+		board.add(dummy2);
+		board.add(dummy3);
+	
+		board.resetRemoved();
+		board.remove(dummy2);
+		board.finalizeRemoved();
+
+		expect(board.objects.length).toBe(2);
+		
+		
+	});
+	
+	it("Overlap", function(){
+		var board = new GameBoard();
+		var dummy = {x: 100, y: 200, h: 10, w: 20};
+		var dummy2 = {x: 10, y: 20, h: 10, w: 20};
+		spyOn(board, "overlap").andCallThrough();
+
+		
+		expect(board.overlap(dummy,dummy2)).toBe(false);
+		expect(board.overlap(dummy,dummy)).toBe(true);
+		
+	});
+	
+	it("Iterate", function(){
+		var board = new GameBoard();
+		var dummy = {func: function (){}};
+		spyOn(dummy, 'func');
+
+		board.add(dummy);
+		board.iterate('func', 10);
+
+		expect(dummy.func).toHaveBeenCalled();
+		expect(dummy.func).toHaveBeenCalledWith(10);
+		
+	});
+	
+	it("Detect", function(){
+		
+		var board = new GameBoard();
+		var dummy = {x: 100, y: 200, h: 10, w: 20};
+		var dummy2 = {x: 10, y: 20, h: 10, w: 20}
+		
+		function tieneCien(){
+			return this.x == 100;
+		}
+		board.add(dummy);
+		board.add(dummy2);
+
+		expect(board.detect(tieneCien)).toBe(dummy);
+
+	});
+	
+	
+});
+
