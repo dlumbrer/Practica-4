@@ -193,9 +193,9 @@ PlayerMissile.prototype.step = function(dt)  {
 
 var FireBall = function(x,y,izquierda) {
 	if(izquierda){
-		this.setup('fireball',{ vy: -700, vx: -50});
+		this.setup('fireball',{ vy: -700, vx: -50, damage: Infinity});
 	}else{
-		this.setup('fireball',{ vy: -700, vx: 50});
+		this.setup('fireball',{ vy: -700, vx: 50, damage: Infinity});
 	}
 	
     this.x = x - this.w/2; 
@@ -209,8 +209,13 @@ FireBall.prototype.step = function(dt)  {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.vy=this.vy + 20;
-        
-    if(this.y < -this.h) { this.board.remove(this); }
+    var collision = this.board.collide(this,OBJECT_ENEMY);
+    if(collision) {
+	collision.hit(this.damage);
+	//this.board.remove(this);
+    } else if(this.y < -this.h) { 
+	this.board.remove(this); 
+    }
 };
 
 
