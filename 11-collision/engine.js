@@ -32,7 +32,7 @@ var Game = new function() {
     };
 
     // Gestión de la entrada (teclas para izda/derecha y disparo)
-    var KEY_CODES = { 37:'left', 39:'right', 32 :'fire' };
+    var KEY_CODES = { 37:'left', 39:'right', 32 :'fire', 66: 'fireb', 78: 'firen' };
     this.keys = {};
 
     this.setupInput = function() {
@@ -204,20 +204,22 @@ var GameBoard = function() {
     this.iterate = function(funcName) {
 	// Convertimos en un array args (1..)
 	var args = Array.prototype.slice.call(arguments,1);
-
-	for(var i=0, len=this.objects.length; i<len;i++) {
-	    var obj = this.objects[i];
-	    obj[funcName].apply(obj,args)
-	}
-
+	this.objects.forEach(function(o){
+		o[funcName].apply(o,args);
+	});
     };
 
     // Devuelve el primer objeto de objects para el que func es true
     this.detect = function(func) {
-	for(var i = 0,val=null, len=this.objects.length; i < len; i++) {
-	    if(func.call(this.objects[i])) return this.objects[i];
-	}
-	return false;
+		var x = _.filter(this.objects, function(o){
+			if(func.call(o)) return o;
+		});
+		
+		if(x.length > 0){
+			return x[0];
+		}else{
+			return false;
+		}	
     };
 
     // Cuando Game.loop() llame a step(), hay que llamar al método
