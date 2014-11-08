@@ -6,9 +6,10 @@
   varios tipos de sprites:
   
   - Los misiles tienen ahora una nueva propiedad: el daño (damage) que
-    producen cuando colisionan con una nave enemiga. Cuando un misil
-    colisione con una nave enemiga le infligirá un daño de cierta
-    cuantía a la nave enemiga con la que impacta, y desaparecerá.
+    infligen a una nave enemiga cuando colisionan con ella. Cuando un
+    misil colisione con una nave enemiga le infligirá un daño de
+    cierta cuantía (damage) a la nave enemiga con la que impacta, y
+    desaparecerá.
 
   - Las naves enemigas tienen ahora una nueva propiedad: su salud
     (health).  El daño ocasionado a una nave enemiga por un misil hará
@@ -46,35 +47,129 @@
 
   No interesa comprobar si se colisiona con cualquier otro objeto,
   sino sólo con los de ciertos tipos. El misil tiene que comprobar si
-  colisiona con enemigos. El enemigo tiene que comprobar si colisiona
-  con la nave del jugador. Para ello cada sprite tiene un tipo y
-  cuando se comprueba si un sprite ha colisionado con otros, se pasa
-  como segundo argumento a collide() el tipo de sprites con los que se
-  quiere ver si ha colisionado el objeto que se pasa como primer
-  argumento.
+  colisiona con naves enemigas. Por otro lado, tras moverse una nave
+  enemiga, ésta tiene que comprobar si colisiona con la nave del
+  jugador. Para ello cada sprite tiene un tipo y cuando se comprueba
+  si un sprite ha colisionado con otros, se pasa como segundo
+  argumento a collide() el tipo de sprites con los que se quiere ver
+  si ha colisionado el objeto que se pasa como primer argumento.
 
-  Cuando un objeto detecta que ha colisionado con otro llama al método
-  hit() del objeto con el que ha colisionado. El misil cuando llama a
-  hit() de una nave enemiga pasa como parámetro el daño que provoca
-  para que la nave enemiga pueda calcular la reducción de salud que
-  conlleva la colisión.
+  Cuando un objeto detecta que ha colisionado con otro, llama al
+  método hit() del objeto con el que ha colisionado. 
 
 
-  Efectos de las colisiones:
+  Efectos de las colisiones de un misil con una nave enemiga:
 
-  Cuando una nave enemiga recibe la llamada .hit() realizada por un
-  misil que ha detectado la colisión, recalcula su salud reduciéndola
-  en tantas unidades como el daño del misil indique, y si su salud
-  llega a 0 desaparece del tablero de juegos, produciéndose en su
-  lugar la animación de una explosión.
+    Cuando el misil llama al método hit() de una nave enemiga, pasa
+    como parámetro el daño que provoca para que la nave enemiga pueda
+    calcular la reducción de salud que conlleva la colisión. Cuando
+    una nave enemiga recibe una llamada a su método .hit() realizada
+    por un misil que ha detectado la colisión, la nave enemiga
+    recalcula su salud reduciéndola en tantas unidades como el daño
+    del misil indique, y si su salud llega a 0 desaparece del tablero
+    de juegos, produciéndose en su lugar la animación de una
+    explosión.
 
-  Cuando la nave del jugador recibe la llamada .hit() realizada por
-  una nave enemiga que ha detectado la colisión, desaparece.
+    El misil, tras informar llamando al métod hit() de la nave enemiga
+    con la que ha detectado colisión, desaparece.
 
-  El misil, tras informar llamando al métod hit() de la nave enemiga
-  con la que ha detectado colisión, desaparece.
 
-  La nave enemiga, tras informar llamando a hit() de la nave del
-  jugador, desaparece.
+  Efectos de las colisiones de una nave enemiga con la nave del jugador:
+
+    Cuando la nave del jugador recibe la llamada .hit() realizada por
+    una nave enemiga que ha detectado la colisión, la nave del jugador
+    desaparece del tablero.
+
+    La nave enemiga, tras informar llamando a hit() de la nave del
+    jugador, desaparece también.
 
 */
+
+describe("Collision", function(){
+	var canvas, ctx;
+
+	beforeEach(function(){
+	loadFixtures('index.html');
+
+	canvas = $('#game')[0];
+	expect(canvas).toExist();
+
+	ctx = canvas.getContext('2d');
+	expect(ctx).toBeDefined();
+
+	oldGame = Game;
+	SpriteSheet = {
+		map : {missile: { sx: 0, sy: 30, w: 2, h: 10, frames: 1 },
+			  ship: { sx: 0, sy: 0, w: 37, h: 42, frames: 1 },
+			  enemy_purple: { sx: 37, sy: 0, w: 42, h: 43, frames: 1 },
+			  enemy_bee: { sx: 79, sy: 0, w: 37, h: 43, frames: 1 },
+			  enemy_ship: { sx: 116, sy: 0, w: 42, h: 43, frames: 1 },
+			  enemy_circle: { sx: 158, sy: 0, w: 32, h: 33, frames: 1 },
+			  fireball: { sx: 0, sy: 64, w: 64, h: 64, frames: 12},
+			  },
+	  draw: function(ctx, name, x, y){},
+	};
+
+	});
+
+	afterEach(function(){
+	Game = oldGame;
+	}); 
+	
+/*	
+  it("Alien destruido",function(){
+	var board = new GameBoard();
+	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple',B: 100, C: 2, E: 100, health: 10  });
+	var misil = new PlayerMissile(1,1);
+	board.add(alien);
+	board.add(misil);
+	spyOn(Enemy.prototype, "hit");
+	board.step(2);
+	expect(board.objects.length).toBe(0);
+	expect(alien.hit).toHaveBeenCalled();
+  });	
+*/	
+  it("Alien dañado pero no destruido",function(){
+	var board = new GameBoard();
+	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', health: 20  });
+	var misil = new PlayerMissile(2,11);
+	board.add(misil);
+	board.add(alien);
+	board.step(0);
+	expect(board.objects.length).toBe(1);
+	expect(board.objects[0]).toBe(alien);
+	expect(alien.health).toBe(10);
+  });
+/*
+  it("La bola destruye pero no desparece",function(){
+	var board = new GameBoard();
+	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', B: 100, C: 2, E: 100, health: 20  });
+	var bolafuego = new FireBall(28,134, false);
+
+
+	board.add(bolafuego);
+	board.add(alien);
+
+	board.step(0.1);
+
+	expect(bolafuego.x).toBe(1);
+	expect(bolafuego.y).toBe(1);
+	expect(alien.x).toBe(1);
+	expect(alien.y).toBe(1);
+	expect(board.objects.length).toBe(1);
+	expect(board.objects[0].sprite).toBe(bolafuego.sprite);
+  });
+*/
+  it("Muerte de jugador (colision nave<->alien)",function(){
+	var board = new GameBoard();
+	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', B: 100, C: 2, E: 100, health: 20  });
+	var nave = new PlayerShip();
+	nave.x = 1;
+	nave.y = 1;
+	board.add(nave);
+	board.add(alien);
+	board.step(0.1);
+	expect(board.objects.length).toBe(0);
+  });
+  
+});

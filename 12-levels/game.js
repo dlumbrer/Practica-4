@@ -5,7 +5,8 @@ var sprites = {
     enemy_bee: { sx: 79, sy: 0, w: 37, h: 43, frames: 1 },
     enemy_ship: { sx: 116, sy: 0, w: 42, h: 43, frames: 1 },
     enemy_circle: { sx: 158, sy: 0, w: 32, h: 33, frames: 1 },
-    explosion: { sx: 0, sy: 64, w: 64, h: 64, frames: 12 }
+    explosion: { sx: 0, sy: 64, w: 64, h: 64, frames: 12 },
+    fireball: { sx: 0, sy: 64, w: 64, h: 64, frames: 12},
 };
 
 var enemies = {
@@ -212,8 +213,15 @@ var PlayerShip = function() {
 	    // Se añaden al gameboard 2 misiles 
 	    this.board.add(new PlayerMissile(this.x,this.y+this.h/2));
 	    this.board.add(new PlayerMissile(this.x+this.w,this.y+this.h/2));
+	     pulsado = Game.keys['fire'];
+	}else if(Game.keys['fireb'] && this.reload < 0) {
+		this.reload = this.reloadTime;
+	    this.board.add(new FireBall(this.x+this.w/2,this.y+this.h/2, true));
+	}else if(Game.keys['firen'] && this.reload < 0) {
+		this.reload = this.reloadTime;
+	    this.board.add(new FireBall(this.x+this.w/2,this.y+this.h/2, false));
 	}
-    };
+    }   
 };
 
 // Heredamos del prototipo new Sprite()
@@ -252,7 +260,32 @@ PlayerMissile.prototype.step = function(dt)  {
     }
 };
 
+var FireBall = function(x,y,izquierda) {
+	if(izquierda){
+		this.setup('fireball',{ vy: -700, vx: -50, damage: Infinity});
+	}else{
+		this.setup('fireball',{ vy: -700, vx: 50, damage: Infinity});
+	}
+	
+    this.x = x - this.w/2; 
+	this.t = 0;
+    this.y = y - this.h; 
+};
+FireBall.prototype = new Sprite();
 
+FireBall.prototype.step = function(dt)  {
+	this.t += dt;
+    this.x += this.vx * dt;
+    this.y += this.vy * dt;
+    this.vy=this.vy + 20;
+    var collision = this.board.collide(this,OBJECT_ENEMY);
+    if(collision) {
+	collision.hit(this.damage);
+	//this.board.remove(this);
+    } else if(this.y < -this.h) { 
+	this.board.remove(this); 
+    }
+};
 // Constructor para las naves enemigas. Un enemigo se define mediante
 // un conjunto de propiedades provenientes de 3 sitios distintos, que
 // se aplican  este orden:
