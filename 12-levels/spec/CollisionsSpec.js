@@ -87,48 +87,38 @@
 
 describe("Collision", function(){
 	var canvas, ctx;
-
-	beforeEach(function(){
-	loadFixtures('index.html');
-
-	canvas = $('#game')[0];
-	expect(canvas).toExist();
-
-	ctx = canvas.getContext('2d');
-	expect(ctx).toBeDefined();
-
-	oldGame = Game;
-	SpriteSheet = {
-		map : {missile: { sx: 0, sy: 30, w: 2, h: 10, frames: 1 },
-			  ship: { sx: 0, sy: 0, w: 37, h: 42, frames: 1 },
-			  enemy_purple: { sx: 37, sy: 0, w: 42, h: 43, frames: 1 },
-			  enemy_bee: { sx: 79, sy: 0, w: 37, h: 43, frames: 1 },
-			  enemy_ship: { sx: 116, sy: 0, w: 42, h: 43, frames: 1 },
-			  enemy_circle: { sx: 158, sy: 0, w: 32, h: 33, frames: 1 },
-			  fireball: { sx: 0, sy: 64, w: 64, h: 64, frames: 12},
-			  },
-	  draw: function(ctx, name, x, y){},
-	};
-
+	beforeEach(function () {
+		loadFixtures('index.html');
+		canvas = $('#game')[0];
+		expect(canvas).toExist();
+		ctx = canvas.getContext('2d');
+		expect(ctx).toBeDefined();
+		oldGame = Game;
+		SpriteSheet = {
+			map: {
+			ship: { sx: 0, sy: 0, w: 37, h: 42, frames: 1 },
+			missile: { sx: 0, sy: 30, w: 2, h: 10, frames: 1 },
+			enemy_purple: { sx: 37, sy: 0, w: 42, h: 43, frames: 1 },
+			fireball: { sx: 0, sy: 64, w: 64, h: 64, frames: 12},
+			explosion: { sx: 0, sy: 64, w: 64, h: 64, frames: 12 }
+			},
+		};
 	});
 
-	afterEach(function(){
-	Game = oldGame;
-	}); 
+
 	
-/*	
+
   it("Alien destruido",function(){
 	var board = new GameBoard();
-	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple',B: 100, C: 2, E: 100, health: 10  });
-	var misil = new PlayerMissile(1,1);
-	board.add(alien);
+	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', health: 10  });
+	var misil = new PlayerMissile(2,11);
 	board.add(misil);
-	spyOn(Enemy.prototype, "hit");
-	board.step(2);
-	expect(board.objects.length).toBe(0);
-	expect(alien.hit).toHaveBeenCalled();
+	board.add(alien);
+	board.step(0);
+	expect(board.objects.length).toBe(1);
+	expect(board.objects[0].sprite).toBe("explosion");
   });	
-*/	
+	
   it("Alien dañado pero no destruido",function(){
 	var board = new GameBoard();
 	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', health: 20  });
@@ -140,26 +130,30 @@ describe("Collision", function(){
 	expect(board.objects[0]).toBe(alien);
 	expect(alien.health).toBe(10);
   });
-/*
+
   it("La bola destruye pero no desparece",function(){
 	var board = new GameBoard();
 	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', B: 100, C: 2, E: 100, health: 20  });
-	var bolafuego = new FireBall(28,134, false);
-
+	var bolafuego = new FireBall(1,1, false);
+	alien.x = 1;
+	alien.y = 1;
+	bolafuego.x = 1;
+	bolafuego.y = 1;
+	bolafuego.vx = 0;
+	bolafuego.vy = 0;
+	alien.vx = 0;
+	alien.vy = 0;
 
 	board.add(bolafuego);
 	board.add(alien);
 
-	board.step(0.1);
+	board.step(1);
 
-	expect(bolafuego.x).toBe(1);
-	expect(bolafuego.y).toBe(1);
-	expect(alien.x).toBe(1);
-	expect(alien.y).toBe(1);
-	expect(board.objects.length).toBe(1);
+	expect(board.objects.length).toBe(2);
 	expect(board.objects[0].sprite).toBe(bolafuego.sprite);
+	expect(board.objects[1].sprite).toBe("explosion");
   });
-*/
+
   it("Muerte de jugador (colision nave<->alien)",function(){
 	var board = new GameBoard();
 	alien = new Enemy({ x: 1, y: 1, sprite: 'enemy_purple', B: 100, C: 2, E: 100, health: 20  });
@@ -169,7 +163,8 @@ describe("Collision", function(){
 	board.add(nave);
 	board.add(alien);
 	board.step(0.1);
-	expect(board.objects.length).toBe(0);
+	expect(board.objects.length).toBe(1);
+	expect(board.objects[0].sprite).toBe("explosion");
   });
   
 });
