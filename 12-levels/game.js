@@ -231,7 +231,8 @@ PlayerShip.prototype.type = OBJECT_PLAYER;
 // Llamada cuando una nave enemiga colisiona con la nave del usuario
 PlayerShip.prototype.hit = function(damage) {
     if(this.board.remove(this)) {
-	loseGame();
+	this.board.add(new Explosion(this.x + this.w/2, this.y + this.h/2));
+	setTimeout("loseGame()", 900);
     }
 };
 
