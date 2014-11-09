@@ -76,7 +76,22 @@ var level1 = [
     [ 18200,    20000, 500,         'straight', { x: 90  } ],
     [ 18200,    20000, 500,         'straight', { x: 10  } ],
     [ 22000,    25000, 400,         'wiggle',   { x: 150 } ],
-    [ 22000,    25000, 400,         'wiggle',   { x: 100 } ]
+    [ 22000,    25000, 400,         'wiggle',   { x: 100 } ],
+    [ 25000,    30000, 400,         'ltr',   { x: 10 } ],
+];
+
+var level2 = [
+  //  Comienzo, Fin,   Frecuencia,  Tipo,       Override
+    [ 0,        4000,  500,         'straight', { x: 50  }  ],
+    [ 6000,     13000, 800,         'ltr'                  ],
+    [ 10000,    16000, 400,         'circle'               ],
+    [ 17800,    20000, 500,         'step',					 ],
+    [ 18200,    20000, 500,         'wiggle', { x: 90  } ],
+    [ 18200,    20000, 500,         'straight', { x: 10  } ],
+    [ 22000,    25000, 400,         'circle',  			],
+    [ 22000,    25000, 400,         'wiggle',   { x: 100 } ],
+    [ 25000,    30000, 400,         'ltr',   { x: 10 } ],
+    [ 25000,    30000, 300,         'circle',   { x: 0 } ],
 ];
 
 
@@ -88,7 +103,7 @@ var playGame = function() {
     // Se un nuevo nivel al tablero de juego, pasando la definición de
     // nivel level1 y la función callback a la que llamar si se ha
     // ganado el juego
-    board.add(new Level(level1, winGame));
+    board.add(new Level(level1, winLevel1));
     Game.setBoard(3,board);
 };
 
@@ -100,6 +115,22 @@ var winGame = function() {
                                     playGame));
 };
 
+var winLevel1 = function() {
+    Game.setBoard(3,new TitleScreen("Completed Level 1", 
+                                    "Press fire to play Level 2",
+                                    playLevel2));
+};
+
+var playLevel2 = function() {
+    var board = new GameBoard();
+    board.add(new PlayerShip());
+
+    // Se un nuevo nivel al tablero de juego, pasando la definición de
+    // nivel level1 y la función callback a la que llamar si se ha
+    // ganado el juego
+    board.add(new Level(level2, winGame));
+    Game.setBoard(3,board);
+};
 
 // Llamada cuando la nave del jugador ha sido alcanzada, para
 // finalizar el juego
